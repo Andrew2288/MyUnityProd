@@ -14,6 +14,7 @@ public class CubeJump : MonoBehaviour
     public static bool afterFlying;
     public static bool isOver;
     public GameObject loseButtons;
+    private bool canJump = false;
     private void Awake()
     {
         isOver = false;
@@ -37,7 +38,7 @@ public class CubeJump : MonoBehaviour
                 }
                 CubeAnimation.ChangeWay();
                 startJumpTime = Time.time;
-
+                canJump = true;
             }
         }
     }
@@ -46,7 +47,7 @@ public class CubeJump : MonoBehaviour
     {
         if (GenNewPlatform.letsStart)
         {
-            if (gameStarted)
+            if (gameStarted && canJump)
             {
                 CubeAnimation.ChangeWay();
 
@@ -108,7 +109,10 @@ public class CubeJump : MonoBehaviour
         if (gameStarted)
         {
             gameStarted = false;
-            Destroy(mainCube.GetComponent<Rigidbody>());
+            if (mainCube.GetComponent<Rigidbody>())
+            {
+                Destroy(mainCube.GetComponent<Rigidbody>());
+            }
             GenNewPlatform.loseGame = true;
             loseButtons.GetComponent<LoseGameScript>().enabled = true;
         }

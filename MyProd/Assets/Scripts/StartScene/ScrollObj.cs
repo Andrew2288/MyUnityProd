@@ -13,12 +13,12 @@ public class ScrollObj : MonoBehaviour
 
     void Update()
     {
-        if (obj.offsetMin.y > range)
+        if (speed > 0 && obj.offsetMin.y < range)
         {
-            obj.offsetMin -= new Vector2(0, speed);
-            obj.offsetMax -= new Vector2(0, speed);
+            obj.offsetMin += new Vector2(0, speed);
+            obj.offsetMax += new Vector2(0, speed);
         }
-        else if (obj.offsetMin.y < range)
+        else if (speed < 0 && obj.offsetMin.y > range)
         {
             obj.offsetMin += new Vector2(0, speed);
             obj.offsetMax += new Vector2(0, speed);

@@ -17,6 +17,7 @@ public class LoseGameScript : MonoBehaviour
 
     private float range, speed;
     public bool lose = false;
+    public GameObject buttonMusic;
     void Start()
     {
         shadow.SetActive(true);
@@ -29,11 +30,19 @@ public class LoseGameScript : MonoBehaviour
 
     private void BackToMenu()
     {
+        if (buttonMusic.GetComponent<AudioSource>().enabled)
+        {
+            buttonMusic.GetComponent<AudioSource>().Play();
+        }
         SceneManager.LoadScene("SampleScene");
     }
 
     private void Exit()
     {
-
+        if (buttonMusic.GetComponent<AudioSource>().enabled)
+        {
+            buttonMusic.GetComponent<AudioSource>().Play();
+        }
+        Application.Quit();
     }
 }

@@ -29,6 +29,10 @@ public class GenNewPlatform : MonoBehaviour
     public GameObject Shadow;
     private static int platformsCount;
     private bool secondPlatform;
+    public GameObject diamondPrefab;
+    private GameObject diamond;
+    public Material[] materials;
+
     void Start()
     {
         secondPlatform = true;
@@ -43,12 +47,12 @@ public class GenNewPlatform : MonoBehaviour
         delay = 3f;
 
 
-        lowBoardY = -3.5f;
-        leftBoardX = -10.0f;
-        rightBoardX = 10.0f;
-
+        lowBoardY = -2.5f;
+        leftBoardX = -8.5f;
+        rightBoardX = 8.5f;
+        platformPrefab.GetComponent<Renderer>().material = materials[UnityEngine.Random.Range(0, 4)];
         Platforms = Instantiate(Empty, new Vector3(0, 0, 0), Quaternion.identity);
-        mainPlatform = CreatObj(new Vector3(-7, 1.9f, -3));
+        mainPlatform = CreatObj(new Vector3(-7, 1.9f, -3), platformPrefab);
         mainPlatform.transform.parent = Platforms.transform;
         platforms = new List<GameObject>();
         platforms.Add(mainPlatform);
@@ -98,25 +102,32 @@ public class GenNewPlatform : MonoBehaviour
                     secondPlatform = false;
                     yield return new WaitForSeconds(1f);
                 }
-                float[,] ranges = { { leftBoardX, mainPlatform.GetComponent<Transform>().position.x - 2 }, { mainPlatform.GetComponent<Transform>().position.x + 2, rightBoardX } };
 
-                if ((rightBoardX - (mainPlatform.GetComponent<Transform>().position.x + 2)) < mainPlatform.GetComponent<Transform>().localScale.x)
+                float[,] ranges = { { leftBoardX, mainPlatform.GetComponent<Transform>().localPosition.x - 2 }, { mainPlatform.GetComponent<Transform>().localPosition.x + 2, rightBoardX } };
+
+                if ((rightBoardX - (mainPlatform.GetComponent<Transform>().localPosition.x + 2)) < mainPlatform.GetComponent<Transform>().localScale.x)
                 {
                     ranges[1, 0] = ranges[0, 0];
                     ranges[1, 1] = ranges[1, 1];
                 }
-                else if ((mainPlatform.GetComponent<Transform>().position.x - 2 - leftBoardX) < mainPlatform.GetComponent<Transform>().localScale.x)
+                else if ((mainPlatform.GetComponent<Transform>().localPosition.x - 2 - leftBoardX) < mainPlatform.GetComponent<Transform>().localScale.x)
                 {
                     ranges[0, 0] = ranges[1, 0];
                     ranges[0, 1] = ranges[1, 1];
                 }
 
                 int id = UnityEngine.Random.Range(0, 1);
-                Vector3 randomPos = new Vector3(UnityEngine.Random.Range(ranges[id, 0], ranges[id, 1]), UnityEngine.Random.Range(lowBoardY, mainPlatform.GetComponent<Transform>().position.y), -3);
+                Vector3 randomPos = new Vector3(UnityEngine.Random.Range(ranges[id, 0], ranges[id, 1]), UnityEngine.Random.Range(lowBoardY, mainPlatform.GetComponent<Transform>().localPosition.y), -3);
 
                 ++platformsCount;
                 oldPlatform = mainPlatform;
-                mainPlatform = CreatObj(randomPos);
+                mainPlatform = CreatObj(randomPos, platformPrefab);
+                if ((int)UnityEngine.Random.Range(0, 5) == 0)
+                {
+                    diamond = CreatObj(randomPos + new Vector3(0, 1, 0), diamondPrefab);
+                    platforms.Add(diamond);
+                    StartCoroutine(WaitForKill(diamond));
+                }
                 platforms.Add(mainPlatform);
                 StartCoroutine(WaitForKill(mainPlatform));
 
@@ -141,9 +152,9 @@ public class GenNewPlatform : MonoBehaviour
         }
     }
 
-    private GameObject CreatObj(Vector3 pos)
+    private GameObject CreatObj(Vector3 pos, GameObject prefab)
     {
-        GameObject newPlatform = Instantiate(platformPrefab, pos, Quaternion.identity);
+        GameObject newPlatform = Instantiate(prefab, pos, Quaternion.identity);
         StartCoroutine(ActivPlatform(newPlatform));
         newPlatform.transform.parent = Platforms.transform;
         return newPlatform;
@@ -159,8 +170,11 @@ public class GenNewPlatform : MonoBehaviour
                 if (platform)
                 {
 
-                    Color color = platform.GetComponent<MeshRenderer>().material.color;
-                    platform.GetComponent<MeshRenderer>().material.color = new Color(color.r, color.g, color.b, color.a - 0.01f);
+                    Color color = platform.GetComponent<Renderer>().material.color;
+                    if (color.a > 0f)
+                    {
+                        platform.GetComponent<Renderer>().material.color = new Color(color.r, color.g, color.b, color.a - 0.01f);
+                    }
                 }
                 yield return new WaitForSeconds(0.01f);
             }
@@ -177,8 +191,8 @@ public class GenNewPlatform : MonoBehaviour
 
         for (int i = 1; i <= 100; ++i)
         {
-            Color color = platform.GetComponent<MeshRenderer>().material.color;
-            platform.GetComponent<MeshRenderer>().material.color = new Color(color.r, color.g, color.b, i * 0.01f);
+            Color color = platform.GetComponent<Renderer>().material.color;
+            platform.GetComponent<Renderer>().material.color = new Color(color.r, color.g, color.b, i * 0.01f);
             yield return new WaitForSeconds(0.01f);
         }
     }
@@ -201,10 +215,10 @@ public class GenNewPlatform : MonoBehaviour
         }
         if (mainCube.GetComponent<Rigidbody>())
         {
-            if (mainCube.transform.position.y < 2 && UpPlatform)
+            if (mainCube.transform.localPosition.y < 2 && UpPlatform)
             {
-                Vector3 pos = new Vector3(Platforms.transform.position.x, Platforms.transform.position.y + 2 - mainCube.transform.position.y, Platforms.transform.position.z);
-                Platforms.transform.position += new Vector3(0, 0.03f, 0);
+                Vector3 pos = new Vector3(Platforms.transform.localPosition.x, Platforms.transform.localPosition.y + 2 - mainCube.transform.localPosition.y, Platforms.transform.localPosition.z);
+                Platforms.transform.localPosition += new Vector3(0, 0.03f, 0);
             }
         }
     }
