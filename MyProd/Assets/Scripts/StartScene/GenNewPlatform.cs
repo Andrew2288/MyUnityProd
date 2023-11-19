@@ -47,13 +47,14 @@ public class GenNewPlatform : MonoBehaviour
         delay = 3f;
 
 
-        lowBoardY = -2.5f;
-        leftBoardX = -8.5f;
-        rightBoardX = 8.5f;
+        lowBoardY = Camera.main.ScreenToWorldPoint(new Vector3(0, 0, 0)).y + 0.2f;
+        leftBoardX = Camera.main.ScreenToWorldPoint(new Vector3(0, 0, 0)).x + 1.1f;
+        rightBoardX = Camera.main.ScreenToWorldPoint(new Vector3(Camera.main.pixelWidth, 0, 0)).x - 1.1f;
         platformPrefab.GetComponent<Renderer>().material = materials[UnityEngine.Random.Range(0, 4)];
         Platforms = Instantiate(Empty, new Vector3(0, 0, 0), Quaternion.identity);
         mainPlatform = CreatObj(new Vector3(-7, 1.9f, -3), platformPrefab);
         mainPlatform.transform.parent = Platforms.transform;
+        Platforms.GetComponent<Rigidbody>().isKinematic = true;
         platforms = new List<GameObject>();
         platforms.Add(mainPlatform);
 
@@ -191,8 +192,11 @@ public class GenNewPlatform : MonoBehaviour
 
         for (int i = 1; i <= 100; ++i)
         {
-            Color color = platform.GetComponent<Renderer>().material.color;
-            platform.GetComponent<Renderer>().material.color = new Color(color.r, color.g, color.b, i * 0.01f);
+            if (platform)
+            {
+                Color color = platform.GetComponent<Renderer>().material.color;
+                platform.GetComponent<Renderer>().material.color = new Color(color.r, color.g, color.b, i * 0.01f);
+            }
             yield return new WaitForSeconds(0.01f);
         }
     }
@@ -205,21 +209,33 @@ public class GenNewPlatform : MonoBehaviour
 
     private void Update()
     {
-        if (letsStart && killingNotActivate)
+        if (!loseGame)
         {
-            killingNotActivate = false;
-            StartCoroutine(WaitForKill(mainPlatform));
-            StartCoroutine(PlatformsGenering());
-            Shadow.SetActive(false);
-            text.enabled = false;
-        }
-        if (mainCube.GetComponent<Rigidbody>())
-        {
-            if (mainCube.transform.localPosition.y < 2 && UpPlatform)
+            if (letsStart && killingNotActivate)
             {
-                Vector3 pos = new Vector3(Platforms.transform.localPosition.x, Platforms.transform.localPosition.y + 2 - mainCube.transform.localPosition.y, Platforms.transform.localPosition.z);
-                Platforms.transform.localPosition += new Vector3(0, 0.03f, 0);
+                killingNotActivate = false;
+                StartCoroutine(WaitForKill(mainPlatform));
+                StartCoroutine(PlatformsGenering());
+                Shadow.SetActive(false);
+                text.enabled = false;
             }
+            if (mainCube.GetComponent<Rigidbody>())
+            {
+
+                if (mainCube.transform.localPosition.y < 2 && UpPlatform)
+                {
+                    Platforms.GetComponent<Rigidbody>().isKinematic = false;
+                    Platforms.GetComponent<Rigidbody>().velocity = new Vector3(0, 10f, 0);
+                }
+                else
+                {
+                    Platforms.GetComponent<Rigidbody>().isKinematic = true;
+                }
+            }
+        }
+        else
+        {
+            Platforms.GetComponent<Rigidbody>().isKinematic = true;
         }
     }
 }

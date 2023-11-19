@@ -53,7 +53,6 @@ public class CubeJump : MonoBehaviour
 
                 float mousePosX = Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, 0, 0)).x;
                 forceVector = new Vector3((mousePosX - mainCube.GetComponent<Transform>().position.x), 15, 0);
-
                 if (!afterFlying)
                 {
                     afterFlying = true;
