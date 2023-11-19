@@ -118,7 +118,7 @@ public class GenNewPlatform : MonoBehaviour
                 }
 
                 int id = UnityEngine.Random.Range(0, 1);
-                Vector3 randomPos = new Vector3(UnityEngine.Random.Range(ranges[id, 0], ranges[id, 1]), UnityEngine.Random.Range(lowBoardY, mainPlatform.GetComponent<Transform>().localPosition.y), -3);
+                Vector3 randomPos = new Vector3(UnityEngine.Random.Range(ranges[id, 0], ranges[id, 1]), UnityEngine.Random.Range(lowBoardY, mainPlatform.GetComponent<Transform>().position.y), -3);
 
                 ++platformsCount;
                 oldPlatform = mainPlatform;
@@ -155,9 +155,10 @@ public class GenNewPlatform : MonoBehaviour
 
     private GameObject CreatObj(Vector3 pos, GameObject prefab)
     {
-        GameObject newPlatform = Instantiate(prefab, pos, Quaternion.identity);
+        GameObject newPlatform = Instantiate(prefab, new Vector3(-100, -100, -3), Quaternion.identity);
         StartCoroutine(ActivPlatform(newPlatform));
         newPlatform.transform.parent = Platforms.transform;
+        newPlatform.GetComponent<Transform>().position = pos;
         return newPlatform;
     }
 
@@ -204,7 +205,7 @@ public class GenNewPlatform : MonoBehaviour
     private IEnumerator WaitForKill(GameObject platform)
     {
         yield return new WaitForSeconds(TimeForLife);
-        StartCoroutine(DelPlatform(platform));
+        //StartCoroutine(DelPlatform(platform));
     }
 
     private void Update()

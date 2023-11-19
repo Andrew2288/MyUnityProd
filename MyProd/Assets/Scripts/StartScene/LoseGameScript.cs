@@ -43,7 +43,6 @@ public class LoseGameScript : MonoBehaviour
         {
             buttonMusic.GetComponent<AudioSource>().Play();
         }
-        PlayerPrefs.DeleteAll();
         Application.Quit();
     }
 }
